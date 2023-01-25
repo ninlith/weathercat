@@ -7,7 +7,9 @@ description = "Terminal weather"
 authors = [
     {name = "Okko Hartikainen", email = "okko.hartikainen@yandex.com"},
 ]
-dependencies = []
+dependencies = [
+    "colorlog>=6.7.0",
+]
 requires-python = ">=3.9"
 readme = "README.md"
 license = {text = "GPL-3.0-only"}

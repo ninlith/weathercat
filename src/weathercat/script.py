@@ -3,8 +3,13 @@
 
 """Terminal weather."""
 
+import logging
 from weathercat import __version__
+from weathercat.config.log import setup_logging
+
+logger = logging.getLogger(__name__)
 
 def main():
     """Execute."""
-    print(__version__)
+    setup_logging(logging.DEBUG)
+    logger.debug(f"{__version__ = }")
