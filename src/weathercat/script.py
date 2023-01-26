@@ -6,6 +6,7 @@
 import logging
 from weathercat import __version__
 from weathercat.config.cli import parse_arguments
+from weathercat.config.file import parse_config_file
 from weathercat.config.log import setup_logging
 
 logger = logging.getLogger(__name__)
@@ -15,3 +16,4 @@ def main():
     args = parse_arguments()
     setup_logging(args.loglevel)
     logger.debug(f"{__version__ = }")
+    conf = parse_config_file()

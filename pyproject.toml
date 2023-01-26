@@ -13,6 +13,8 @@ authors = [
 ]
 dependencies = [
     "colorlog>=6.7.0",
+    "platformdirs>=2.6.2",
+    "tomli>=2.0.1",
 ]
 requires-python = ">=3.9"
 readme = "README.md"
