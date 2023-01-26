@@ -5,11 +5,13 @@
 
 import logging
 from weathercat import __version__
+from weathercat.config.cli import parse_arguments
 from weathercat.config.log import setup_logging
 
 logger = logging.getLogger(__name__)
 
 def main():
     """Execute."""
-    setup_logging(logging.DEBUG)
+    args = parse_arguments()
+    setup_logging(args.loglevel)
     logger.debug(f"{__version__ = }")
