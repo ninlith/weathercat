@@ -8,7 +8,7 @@ import logging.config
 
 def setup_logging(loglevel):
     """Set up logging configuration."""
-    logging.config.dictConfig(dict(
+    logging.config.dictConfig(dict(  #pylint: disable=R1735
         version=1,
         disable_existing_loggers=False,
         formatters={

@@ -3,11 +3,12 @@
 
 """Terminal weather."""
 
+import locale
 import logging
+import sys
 from weathercat import __version__
-from weathercat.config.cli import parse_arguments
-from weathercat.config.file import parse_config_file
-from weathercat.config.log import setup_logging
+from weathercat.config import parse_arguments, parse_config_file, setup_logging
+from weathercat.geolocation import geolocate, georesolve
 
 logger = logging.getLogger(__name__)
 
@@ -17,3 +18,17 @@ def main():
     setup_logging(args.loglevel)
     logger.debug(f"{__version__ = }")
     conf = parse_config_file()
+    locale.setlocale(locale.LC_ALL, conf.get("locale", ""))
+
+    if args.location:
+        try:
+            toponym, ϕ, λ = georesolve(" ".join(args.location))
+        except LookupError as exc:
+            print(exc)
+            sys.exit(1)
+    elif "default_location" in conf:
+        toponym, ϕ, λ = [conf["default_location"][x]
+                         for x in ["name", "latitude", "longitude"]]
+    else:
+        toponym, ϕ, λ = georesolve(" ".join(str(x) for x in geolocate()))
+    logger.debug(f"{toponym = }, {ϕ = }, {λ = }")

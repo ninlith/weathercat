@@ -18,7 +18,9 @@ def parse_config_file() -> dict:
         try:
             config_directory.mkdir(parents=True, exist_ok=True)
             config_file.write_text(
-                '# default_location = "geo:61.000689,24.479063"\n'
+                '# default_location.latitude = 61.000689\n'
+                '# default_location.longitude = 24.479063\n'
+                '# default_location.name = "Hämeenlinna"\n'
                 '# locale = "fi_FI.UTF-8"\n')
         except OSError as error:  # handle read-only file system etc.
             logger.error(error)

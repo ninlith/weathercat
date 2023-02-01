@@ -2,7 +2,11 @@
 [tool.pdm.dev-dependencies]
 dev = [
     "pylint>=2.15.10",
+    "pytest>=7.2.1",
 ]
+
+[tool.pdm.scripts]
+pytest-log = "pytest -o log_cli=true -o log_level=DEBUG"
 
 [project]
 name = "weathercat"
@@ -15,6 +19,8 @@ dependencies = [
     "colorlog>=6.7.0",
     "platformdirs>=2.6.2",
     "tomli>=2.0.1",
+    "geopy>=2.3.0",
+    "geocoder>=1.38.1",
 ]
 requires-python = ">=3.9"
 readme = "README.md"
@@ -23,6 +29,25 @@ license = {text = "GPL-3.0-only"}
 [project.scripts]
 weathercat = "weathercat.script:main"
 
+[project.optional-dependencies]
+gi = [  # https://pygobject.readthedocs.io/en/latest/devguide/dev_environ.html
+    "PyGObject>=3.42.2",
+]
 [build-system]
 requires = ["pdm-pep517>=1.0"]
 build-backend = "pdm.pep517.api"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+    "logging-fstring-interpolation",
+    ]
+good-names = [
+    "ϕ",
+    "φ",
+    "λ",
+]

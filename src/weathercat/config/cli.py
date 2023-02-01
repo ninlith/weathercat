@@ -7,7 +7,7 @@ import argparse
 import logging
 from importlib.metadata import metadata
 
-def parse_arguments():
+def parse_arguments(argv=None):
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
         description=metadata("weathercat")["Summary"],
@@ -23,7 +23,10 @@ def parse_arguments():
     parser.add_argument(
         "location",
         metavar="LOCATION",
-        nargs="?",
-        help="textual description or latitude, longitude",
+        nargs="*",
+        help="free-form query or coordinates (geo URI or latitude, longitude)",
         )
-    return parser.parse_args()
+    args, unknown_args = parser.parse_known_args(argv)
+    if unknown_args:
+        args.location = unknown_args + args.location
+    return args
