@@ -4,26 +4,20 @@
 """Logging configuration."""
 
 import logging
-import logging.config
+from rich.logging import RichHandler
 
 def setup_logging(loglevel):
     """Set up logging configuration."""
-    logging.config.dictConfig(dict(  #pylint: disable=R1735
-        version=1,
-        disable_existing_loggers=False,
-        formatters={
-            "f": {
-                "class": "colorlog.ColoredFormatter",
-                "format": "%(fg_thin_white)s%(asctime)s%(reset)s "
-                          "%(log_color)s%(levelname)-3.3s%(reset)s "
-                          "%(fg_thin_cyan)s[%(name)s]%(reset)s %(message)s",
-                "datefmt": "%F %T"}},
-        handlers={
-            "h": {
-                "class": "logging.StreamHandler",
-                "formatter": "f",
-                "level": loglevel}},
-        root={
-            "handlers": ["h"],
-            "level": loglevel},
-        ))
+    logging.basicConfig(level=loglevel,
+                        format="%(message)s",
+                        datefmt="[%T]",
+                        handlers=[RichHandler()])
+
+    # https://stackoverflow.com/a/66416102
+    old_factory = logging.getLogRecordFactory()
+    def record_factory(*args, **kwargs):
+        record = old_factory(*args, **kwargs)  # get the unmodified record
+        record.lineno = None
+        record.pathname = record.name
+        return record
+    logging.setLogRecordFactory(record_factory)
