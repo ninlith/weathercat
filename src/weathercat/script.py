@@ -10,6 +10,7 @@ from weathercat import __version__
 from weathercat.config import parse_arguments, parse_config_file, setup_logging
 from weathercat.geolocation import geolocate, georesolve
 from weathercat.providers.open_meteo import get_forecast
+from weathercat.output import output
 
 logger = logging.getLogger(__name__)
 
@@ -35,4 +36,4 @@ def main():
     logger.debug(f"{toponym = }, {ϕ = }, {λ = }")
 
     forecast = get_forecast(ϕ, λ)
-    print(forecast)
+    output(forecast, toponym)

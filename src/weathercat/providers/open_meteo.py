@@ -11,7 +11,8 @@ def get_forecast(latitude, longitude):
         "longitude": longitude,
         "hourly": "temperature_2m,weathercode,windspeed_10m",
         "daily": "weathercode,temperature_2m_max,temperature_2m_min,"
-                 "apparent_temperature_max,apparent_temperature_min",
+                 "apparent_temperature_max,apparent_temperature_min,"
+                 "sunrise,sunset",
         "windspeed_unit": "ms",
         "timezone": requests.utils.quote((get_localzone_name() or "auto"),
                                          safe=""),
