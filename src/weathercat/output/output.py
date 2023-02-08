@@ -18,7 +18,7 @@ try:
 except ImportError:
     skyfield_is_available = False
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__package__)
 
 custom_theme = Theme({
     "toponym": "magenta",

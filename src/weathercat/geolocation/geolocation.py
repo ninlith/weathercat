@@ -14,7 +14,7 @@ try:
 except ImportError:
     gi = None
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__package__)
 
 def georesolve(location: str) -> tuple[str | None, float, float]:
     """Resolve description or coordinates to toponym and coordinates."""
