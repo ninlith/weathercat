@@ -4,6 +4,7 @@
 """Logging configuration."""
 
 import logging
+from rich.console import Console
 from rich.logging import RichHandler
 
 def setup_logging(loglevel):
@@ -11,7 +12,7 @@ def setup_logging(loglevel):
     logging.basicConfig(level=loglevel,
                         format="%(message)s",
                         datefmt="[%T]",
-                        handlers=[RichHandler()])
+                        handlers=[RichHandler(console=Console(stderr=True))])
 
     # https://stackoverflow.com/a/66416102
     old_factory = logging.getLogRecordFactory()
