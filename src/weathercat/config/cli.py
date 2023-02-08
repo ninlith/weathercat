@@ -71,6 +71,11 @@ def parse_arguments(argv=None):
         help="enable DEBUG logging level",
         )
     parser.add_argument(
+        "-a", "--autolocate",
+        action="store_true",
+        help="force location autodetection",
+        )
+    parser.add_argument(
         "location",
         metavar="LOCATION",
         nargs="*",

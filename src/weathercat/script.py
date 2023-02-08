@@ -28,7 +28,7 @@ def main():
         except LookupError as exc:
             print(exc)
             sys.exit(1)
-    elif "default_location" in conf:
+    elif "default_location" in conf and not args.autolocate:
         toponym, ϕ, λ = [conf["default_location"][x]
                          for x in ["name", "latitude", "longitude"]]
     else:
