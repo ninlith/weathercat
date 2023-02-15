@@ -11,6 +11,6 @@ def no_network(monkeypatch):
         raise socket.gaierror("mocked")
     monkeypatch.setattr("socket.socket", socket_mock)
 
-def pytest_sessionstart(session):
+def pytest_sessionstart(session):  # pylint: disable=unused-argument
     """Run code before collection and run test loop."""
     print_saved_forecast()

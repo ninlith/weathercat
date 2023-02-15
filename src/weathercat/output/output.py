@@ -14,9 +14,9 @@ from rich.table import Table
 try:
     from skyfield import api
     from skyfield import almanac
-    skyfield_is_available = True
+    skyfield_is_available = True  # pylint: disable=invalid-name
 except ImportError:
-    skyfield_is_available = False
+    skyfield_is_available = False  # pylint: disable=invalid-name
 
 logger = logging.getLogger(__package__)
 
@@ -35,7 +35,7 @@ custom_theme = Theme({
     "feels_like_colder": "bright_cyan",
 })
 
-def represent_ww(code: int):
+def represent_ww(code: int):  # pylint: disable=too-many-return-statements
     """Symbolize and colorize WMO Weather interpretation codes (WW)."""
     # https://open-meteo.com/en/docs#weathervariables
     if code in (0,):
@@ -88,7 +88,7 @@ def fabricate_moon_function():
         file = directory / filename
         try:
             eph = api.load_file(file)
-            logger.debug(f"Loaded '{file}'")
+            logger.debug(f"Loaded {file}")
         except FileNotFoundError:
             load = api.Loader(directory, verbose=True)
             url = load.build_url(filename)
@@ -105,6 +105,7 @@ def fabricate_moon_function():
             _times, phases = almanac.find_discrete(start_time,
                                                    end_time,
                                                    almanac.moon_phases(eph))
+            del _times  # unused
             if "Full Moon" in [almanac.MOON_PHASES[phase] for phase in phases]:
                 return "🌕"
             return ""
@@ -126,8 +127,10 @@ def output(forecast, toponym):
     markers = defaultdict(lambda: "00    06    12    18    24"
                                   .translate(subscript))
     markers[0] = markers[0][:hour] + "🐈" + markers[0][hour + 2:]
+    # pylint: disable=unnecessary-lambda-assignment
     condition = lambda i: represent_ww(forecast["hourly"]["weathercode"][i])[1]
     wind = lambda i: represent_wind(forecast["hourly"]["windspeed_10m"][i])
+    # pylint: enable=unnecessary-lambda-assignment
     moon = fabricate_moon_function()
     for day in range(7):
         table.add_row(" [dim]" + markers[day] + "[/]")

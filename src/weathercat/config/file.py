@@ -14,7 +14,7 @@ def parse_config_file() -> dict:
     config_directory = platformdirs.user_config_path("weathercat")
     config_file = config_directory / "weathercat.conf"
     if not config_file.is_file():
-        logger.debug(f"Creating '{config_file}'")
+        logger.debug(f"Creating {config_file}")
         try:
             config_directory.mkdir(parents=True, exist_ok=True)
             config_file.write_text(
@@ -25,6 +25,6 @@ def parse_config_file() -> dict:
         except OSError as error:  # handle read-only file system etc.
             logger.error(error)
         return {}
-    logger.debug(f"Reading '{config_file}'")
+    logger.debug(f"Reading {config_file}")
     with open(config_file, mode="rb") as file_object:
         return tomli.load(file_object)

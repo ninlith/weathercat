@@ -51,6 +51,10 @@ testpaths = [
 disable = [
     "logging-fstring-interpolation",
 ]
+enable = [
+    "useless-suppression",
+    "use-symbolic-message-instead",
+]
 good-names = [
     "ϕ",
     "φ",

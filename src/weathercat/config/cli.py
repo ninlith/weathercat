@@ -56,12 +56,12 @@ def parse_arguments(argv=None):
     parser = argparse.ArgumentParser(
         description=metadata("weathercat")["Summary"],
         add_help=False,
-        )
+    )
     parser.add_argument(
         "-h", "--help",
         action="store_true",
         help="show this help message and exit",
-        )
+    )
     parser.add_argument(
         "-d", "--debug",
         action="store_const",
@@ -69,18 +69,18 @@ def parse_arguments(argv=None):
         const=logging.DEBUG,
         default=logging.INFO,
         help="enable DEBUG logging level",
-        )
+    )
     parser.add_argument(
         "-a", "--autolocate",
         action="store_true",
         help="force location autodetection",
-        )
+    )
     parser.add_argument(
         "location",
         metavar="LOCATION",
         nargs="*",
         help="free-form query or coordinates (geo URI or latitude, longitude)",
-        )
+    )
     args, unknown_args = parser.parse_known_args(argv)
     if args.help:
         parser.print_help()
