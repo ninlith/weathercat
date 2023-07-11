@@ -22,6 +22,7 @@ logger = logging.getLogger(__package__)
 
 custom_theme = Theme({
     "toponym": "magenta",
+    "coordinates": "dim magenta",
     "sun": "yellow",
     "dim": "dim",
     "clear": "reverse bright_black",
@@ -67,12 +68,10 @@ def represent_wind(speed):
         return "⣶"
     return "⣿"
 
-def represent_temperature(t_min, t_max, apparent_min, apparent_max):
+def represent_temperature(temperature, apparent_temperature):
     """Colorize temperature based on apparent temperature."""
     # https://www.ilmatieteenlaitos.fi/saamerkkien-selitykset
-    temperature = (t_min + t_max)/2
-    apparent_temperature = (apparent_min + apparent_max)/2
-    string = f"{str(round(temperature)).replace('-', '−')} °C"
+    string = f"{str(round(temperature)).replace('-', '−')}"
     if apparent_temperature >= temperature + 2:
         return f"[feels_like_warmer]{string}[/]"
     if apparent_temperature <= temperature - 5:
@@ -114,6 +113,7 @@ def fabricate_moon_function():
 
 def output(forecast, toponym):
     """Output a forecast."""
+    # pylint: disable=too-many-locals
     superscript = {ord(k): v for k, v in zip("+-−0123456789", "⁺⁻⁻⁰¹²³⁴⁵⁶⁷⁸⁹")}
     subscript = {ord(k): v for k, v in zip("+-−0123456789", "₊₋₋₀₁₂₃₄₅₆₇₈₉")}
 
@@ -121,7 +121,8 @@ def output(forecast, toponym):
     table.add_column("hourly", no_wrap=True)
     table.add_column("day", no_wrap=True)
     table.add_column("symbol", no_wrap=True)
-    table.add_column("temperature", no_wrap=True, justify="right")
+    table.add_column("min_temperature", no_wrap=True, justify="right")
+    table.add_column("max_temperature", no_wrap=True, justify="right")
     table.add_column("moon", no_wrap=True)
     hour = datetime.now().hour
     markers = defaultdict(lambda: "00    06    12    18    24"
@@ -142,21 +143,39 @@ def output(forecast, toponym):
             represent_ww(forecast["daily"]["weathercode"][day])[0],
             "  " + represent_temperature(
                 forecast["daily"]["temperature_2m_min"][day],
+                forecast["daily"]["apparent_temperature_min"][day])
+                + " [dim]/[/]",
+            represent_temperature(
                 forecast["daily"]["temperature_2m_max"][day],
-                forecast["daily"]["apparent_temperature_min"][day],
-                forecast["daily"]["apparent_temperature_max"][day]),
+                forecast["daily"]["apparent_temperature_max"][day])
+                + " [dim]°C[/]",
             " " + moon(forecast["daily"]["time"][day], forecast["timezone"]))
         table.add_row("  " + "  ".join(
             f'{round(forecast["hourly"]["temperature_2m"][i]):>3}' for i in
             [day*24 + h for h in range(2, 23, 5)]).translate(superscript))
 
+    latitude = forecast["latitude"]
+    longitude = forecast["longitude"]
     sunrise = forecast["daily"]["sunrise"][0].split("T")[1]
     sunset = forecast["daily"]["sunset"][0].split("T")[1]
+    current_time = forecast["current_weather"]["time"].split("T")[1]
+    current_weather = represent_ww(
+        forecast["current_weather"]["weathercode"])[0]
+    current_temperature = forecast["current_weather"]["temperature"]
+    current_apparent_temperature = forecast["hourly"]["apparent_temperature"][
+        forecast["hourly"]["time"].index(forecast["current_weather"]["time"])]
     outer_table = Table.grid(padding=(0, 2), expand=True)
     outer_table.add_column(no_wrap=True)
     outer_table.add_column(justify="right")
     outer_table.add_row(
         table,
-        f"[toponym]{toponym}[/]\n\n[sun]☉  {sunrise}–{sunset}[/]")
+        f"[toponym]{toponym}[/]\n"
+        f"[coordinates]geo:{latitude},{longitude}[/]\n\n"
+        f"[sun]☉  {sunrise}–{sunset}[/]\n\n"
+        f"[dim]{current_time}[/]  {current_weather}   "
+        + represent_temperature(current_temperature,
+                                current_apparent_temperature)
+        + " [dim]°C[/]"
+        )
     console = Console(theme=custom_theme)
     console.print(outer_table)

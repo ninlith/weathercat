@@ -23,10 +23,12 @@ def get_forecast(latitude, longitude):
     payload = {
         "latitude": latitude,
         "longitude": longitude,
-        "hourly": "temperature_2m,weathercode,windspeed_10m",
+        "hourly": "temperature_2m,apparent_temperature,weathercode,"
+                  "windspeed_10m",
         "daily": "weathercode,temperature_2m_max,temperature_2m_min,"
                  "apparent_temperature_max,apparent_temperature_min,"
                  "sunrise,sunset",
+        "current_weather": "true",
         "windspeed_unit": "ms",
         "timezone": requests.utils.quote((get_localzone_name() or "auto"),
                                          safe=""),

@@ -17,7 +17,7 @@ def print_saved_forecast():
 
 def test_temperature():
     """Test temperature representation."""
-    assert "feels_like_warmer" in represent_temperature(0, 0, 2, 2)
-    assert "feels_like_warmer" not in represent_temperature(0, 0, 1, 1)
-    assert "feels_like_colder" in represent_temperature(0, 0, -5, -5)
-    assert "feels_like_colder" not in represent_temperature(0, 0, -4, -4)
+    assert "feels_like_warmer" in represent_temperature(0, 2)
+    assert "feels_like_warmer" not in represent_temperature(0, 1)
+    assert "feels_like_colder" in represent_temperature(0, -5)
+    assert "feels_like_colder" not in represent_temperature(0, -4)
