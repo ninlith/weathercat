@@ -10,7 +10,7 @@ pytest-log = "pytest -o log_cli=true -o log_level=DEBUG"
 
 [project]
 name = "weathercat"
-version = "0.2"
+version = "0.3"
 description = "Terminal weather"
 authors = [
     {name = "Okko Hartikainen", email = "okko.hartikainen@yandex.com"},
