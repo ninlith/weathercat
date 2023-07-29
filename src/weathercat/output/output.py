@@ -34,6 +34,11 @@ custom_theme = Theme({
     "thunderstorm": "reverse bright_yellow",
     "feels_like_warmer": "bright_red",
     "feels_like_colder": "bright_cyan",
+    "uv_low": "bright_green",
+    "uv_moderate": "bright_yellow",
+    "uv_high": "bright_red",
+    "uv_very_high": "red",
+    "uv_extreme": "magenta",
 })
 
 def represent_ww(code: int):  # pylint: disable=too-many-return-statements
@@ -67,6 +72,18 @@ def represent_wind(speed):
     if speed < 20.5:
         return "⣶"
     return "⣿"
+
+def represent_uvi(uvi):
+    """Colorize UV index."""
+    if uvi < 3:
+        return f"[uv_low]{uvi}[/]"
+    if uvi < 6:
+        return f"[uv_moderate]{uvi}[/]"
+    if uvi < 8:
+        return f"[uv_high]{uvi}[/]"
+    if uvi < 11:
+        return f"[uv_very_high]{uvi}[/]"
+    return f"[uv_extreme]{uvi}[/]"
 
 def represent_temperature(temperature, apparent_temperature):
     """Colorize temperature based on apparent temperature."""
@@ -123,6 +140,7 @@ def output(forecast, toponym):
     table.add_column("symbol", no_wrap=True)
     table.add_column("min_temperature", no_wrap=True, justify="right")
     table.add_column("max_temperature", no_wrap=True, justify="right")
+    table.add_column("uvi", no_wrap=True)
     table.add_column("moon", no_wrap=True)
     hour = datetime.now().hour
     markers = defaultdict(lambda: "00    06    12    18    24"
@@ -149,15 +167,17 @@ def output(forecast, toponym):
                 forecast["daily"]["temperature_2m_max"][day],
                 forecast["daily"]["apparent_temperature_max"][day])
                 + " [dim]°C[/]",
+            " [dim]ᵁⱽ[/]" + represent_uvi(
+                round(forecast["daily"]["uv_index_max"][day])
+                ).translate(subscript),
             " " + moon(forecast["daily"]["time"][day], forecast["timezone"]))
         table.add_row("  " + "  ".join(
             f'{round(forecast["hourly"]["temperature_2m"][i]):>3}' for i in
             [day*24 + h for h in range(2, 23, 5)]).translate(superscript))
 
-    latitude = forecast["latitude"]
-    longitude = forecast["longitude"]
     sunrise = forecast["daily"]["sunrise"][0].split("T")[1]
     sunset = forecast["daily"]["sunset"][0].split("T")[1]
+    uvi_clear_sky = round(forecast["daily"]["uv_index_clear_sky_max"][0])
     current_time = forecast["current_weather"]["time"].split("T")[1]
     current_weather = represent_ww(
         forecast["current_weather"]["weathercode"])[0]
@@ -169,9 +189,10 @@ def output(forecast, toponym):
     outer_table.add_column(justify="right")
     outer_table.add_row(
         table,
-        f"[toponym]{toponym}[/]\n"
-        f"[coordinates]geo:{latitude},{longitude}[/]\n\n"
-        f"[sun]☉  {sunrise}–{sunset}[/]\n\n"
+        f"[toponym]{toponym}[/]\n\n"
+        f"[sun]☉  {sunrise}–{sunset}[/]\n"
+        f"[sun]ᵁⱽᴵ [dim]ᶜˡᵉᵃʳ ˢᵏʸ ᵐᵃˣ[/][/] "
+            + represent_uvi(uvi_clear_sky).translate(superscript) + "\n\n"
         f"[dim]{current_time}[/]  {current_weather}   "
         + represent_temperature(current_temperature,
                                 current_apparent_temperature)

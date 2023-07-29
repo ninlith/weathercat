@@ -27,7 +27,7 @@ def get_forecast(latitude, longitude):
                   "windspeed_10m",
         "daily": "weathercode,temperature_2m_max,temperature_2m_min,"
                  "apparent_temperature_max,apparent_temperature_min,"
-                 "sunrise,sunset",
+                 "sunrise,sunset,uv_index_max,uv_index_clear_sky_max",
         "current_weather": "true",
         "windspeed_unit": "ms",
         "timezone": requests.utils.quote((get_localzone_name() or "auto"),
