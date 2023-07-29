@@ -39,9 +39,9 @@ def georesolve(location: str) -> tuple[str | None, float, float]:
     if not response:
         raise LookupError(f"Unknown location: {location}")
     logger.debug(f"{response.raw = }")
-    if any(x in response.raw["address"] for x in ("city", "town", "village")):
+    if any(x in response.raw["address"] for x in ("village", "town", "city")):
         toponym = ", ".join(response.raw["address"][x]
-                            for x in ("city", "town", "village", "country")
+                            for x in ("village", "town", "city", "country")
                             if x in response.raw["address"])
     else:
         toponym = response.address
