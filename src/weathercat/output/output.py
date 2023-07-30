@@ -136,12 +136,12 @@ def output(forecast, toponym):
 
     table = Table.grid(padding=(0, 1))
     table.add_column("hourly", no_wrap=True)
-    table.add_column("day", no_wrap=True)
-    table.add_column("symbol", no_wrap=True)
+    table.add_column("day")
+    table.add_column("symbol")
     table.add_column("min_temperature", no_wrap=True, justify="right")
     table.add_column("max_temperature", no_wrap=True, justify="right")
     table.add_column("uvi", no_wrap=True)
-    table.add_column("moon", no_wrap=True)
+    table.add_column("moon")
     hour = datetime.now().hour
     markers = defaultdict(lambda: "00    06    12    18    24"
                                   .translate(subscript))
@@ -184,19 +184,28 @@ def output(forecast, toponym):
     current_temperature = forecast["current_weather"]["temperature"]
     current_apparent_temperature = forecast["hourly"]["apparent_temperature"][
         forecast["hourly"]["time"].index(forecast["current_weather"]["time"])]
-    outer_table = Table.grid(padding=(0, 2), expand=True)
-    outer_table.add_column(no_wrap=True)
-    outer_table.add_column(justify="right")
-    outer_table.add_row(
-        table,
-        f"[toponym]{toponym}[/]\n\n"
-        f"[sun]☉  {sunrise}–{sunset}[/]\n"
-        f"[sun]ᵁⱽᴵ [dim]ᶜˡᵉᵃʳ ˢᵏʸ ᵐᵃˣ[/][/] "
-            + represent_uvi(uvi_clear_sky).translate(superscript) + "\n\n"
-        f"[dim]{current_time}[/]  {current_weather}   "
+    details_table = Table.grid(expand=True)
+    details_table.add_column(justify="right")
+    details_table.add_row(f"[toponym]{toponym}[/]")
+    details_table.add_row()
+    details_table.add_row(f"[sun]☉  {sunrise}–{sunset}[/]")
+    details_table.add_row(f"[sun]ᵁⱽᴵ [dim]ᶜˡᵉᵃʳ ˢᵏʸ ᵐᵃˣ[/][/] "
+        + represent_uvi(uvi_clear_sky).translate(superscript))
+    details_table.add_row()
+    details_table.add_row(f"[dim]{current_time}[/]  {current_weather}   "
         + represent_temperature(current_temperature,
                                 current_apparent_temperature)
-        + " [dim]°C[/]"
-        )
+        + " [dim]°C[/]")
+
     console = Console(theme=custom_theme)
+    if console.size.width < 80:
+        outer_table = Table.grid(padding=(1, 0), expand=True)
+        outer_table.add_column()
+        outer_table.add_row(details_table)
+        outer_table.add_row(table)
+    else:
+        outer_table = Table.grid(padding=(0, 2), expand=True)
+        outer_table.add_column(no_wrap=True)
+        outer_table.add_column()
+        outer_table.add_row(table, details_table)
     console.print(outer_table)
