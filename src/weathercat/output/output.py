@@ -131,17 +131,18 @@ def fabricate_moon_function():
 def output(forecast, toponym):
     """Output a forecast."""
     # pylint: disable=too-many-locals
+    # pylint: disable=too-many-statements
     superscript = {ord(k): v for k, v in zip("+-−0123456789", "⁺⁻⁻⁰¹²³⁴⁵⁶⁷⁸⁹")}
     subscript = {ord(k): v for k, v in zip("+-−0123456789", "₊₋₋₀₁₂₃₄₅₆₇₈₉")}
 
-    table = Table.grid(padding=(0, 1))
-    table.add_column("hourly", no_wrap=True)
-    table.add_column("day")
-    table.add_column("symbol")
-    table.add_column("min_temperature", no_wrap=True, justify="right")
-    table.add_column("max_temperature", no_wrap=True, justify="right")
-    table.add_column("uvi", no_wrap=True)
-    table.add_column("moon")
+    forecast_table = Table.grid(padding=(0, 1))
+    forecast_table.add_column("hourly", no_wrap=True)
+    forecast_table.add_column("day")
+    forecast_table.add_column("symbol")
+    forecast_table.add_column("min_temperature", no_wrap=True, justify="right")
+    forecast_table.add_column("max_temperature", no_wrap=True, justify="right")
+    forecast_table.add_column("uvi", no_wrap=True)
+    forecast_table.add_column("moon")
     hour = datetime.now().hour
     markers = defaultdict(lambda: "00    06    12    18    24"
                                   .translate(subscript))
@@ -152,60 +153,69 @@ def output(forecast, toponym):
     # pylint: enable=unnecessary-lambda-assignment
     moon = fabricate_moon_function()
     for day in range(7):
-        table.add_row(" [dim]" + markers[day] + "[/]")
-        table.add_row(
-            "  " + "".join(["[" + condition(i) + "]" + wind(i) + "[/]"
-                            for i in [day*24 + h for h in range(24)]]),
-            datetime.fromisoformat(forecast["daily"]["time"][day])
-                                   .strftime("[dim]%a[/] "),
-            represent_ww(forecast["daily"]["weathercode"][day])[0],
-            "  " + represent_temperature(
-                forecast["daily"]["temperature_2m_min"][day],
-                forecast["daily"]["apparent_temperature_min"][day])
-                + " [dim]/[/]",
-            represent_temperature(
-                forecast["daily"]["temperature_2m_max"][day],
-                forecast["daily"]["apparent_temperature_max"][day])
-                + " [dim]°C[/]",
-            " [dim]ᵁⱽ[/]" + represent_uvi(
-                round(forecast["daily"]["uv_index_max"][day])
-                ).translate(subscript),
-            " " + moon(forecast["daily"]["time"][day], forecast["timezone"]))
-        table.add_row("  " + "  ".join(
+        condition_bar = "".join(["[" + condition(i) + "]" + wind(i) + "[/]"
+                                 for i in [day*24 + h for h in range(24)]])
+        weekday = datetime.fromisoformat(
+            forecast["daily"]["time"][day]).strftime("%a")
+        weather_symbol = represent_ww(forecast["daily"]["weathercode"][day])[0]
+        min_temperature = represent_temperature(
+            forecast["daily"]["temperature_2m_min"][day],
+            forecast["daily"]["apparent_temperature_min"][day])
+        max_temperature = represent_temperature(
+            forecast["daily"]["temperature_2m_max"][day],
+            forecast["daily"]["apparent_temperature_max"][day])
+        uvi = represent_uvi(
+            round(forecast["daily"]["uv_index_max"][day])
+            ).translate(subscript)
+        moon_symbol = moon(forecast["daily"]["time"][day],
+                           forecast["timezone"])
+        temperatures = "  ".join(
             f'{round(forecast["hourly"]["temperature_2m"][i]):>3}' for i in
-            [day*24 + h for h in range(2, 23, 5)]).translate(superscript))
+            [day*24 + h for h in range(2, 23, 5)]).translate(superscript)
+        forecast_table.add_row(
+            f" [dim]{markers[day]}[/]")
+        forecast_table.add_row(
+            f"  {condition_bar}",
+            f"[dim]{weekday}[/] ",
+            f"{weather_symbol}",
+            f"  {min_temperature} [dim]/[/]",
+            f"{max_temperature} [dim]°C[/]",
+            f" [dim]ᵁⱽ[/]{uvi}",
+            f" {moon_symbol}")
+        forecast_table.add_row(
+            f"  {temperatures}")
 
     sunrise = forecast["daily"]["sunrise"][0].split("T")[1]
     sunset = forecast["daily"]["sunset"][0].split("T")[1]
-    uvi_clear_sky = round(forecast["daily"]["uv_index_clear_sky_max"][0])
+    uvi_clear_sky = represent_uvi(round(
+        forecast["daily"]["uv_index_clear_sky_max"][0])).translate(superscript)
     current_time = forecast["current_weather"]["time"].split("T")[1]
     current_weather = represent_ww(
         forecast["current_weather"]["weathercode"])[0]
-    current_temperature = forecast["current_weather"]["temperature"]
-    current_apparent_temperature = forecast["hourly"]["apparent_temperature"][
-        forecast["hourly"]["time"].index(forecast["current_weather"]["time"])]
+    current_temperature = represent_temperature(
+        forecast["current_weather"]["temperature"],
+        forecast["hourly"]["apparent_temperature"][
+            forecast["hourly"]["time"].index(
+                forecast["current_weather"]["time"])])
     details_table = Table.grid(expand=True)
     details_table.add_column(justify="right")
     details_table.add_row(f"[toponym]{toponym}[/]")
     details_table.add_row()
     details_table.add_row(f"[sun]☉  {sunrise}–{sunset}[/]")
-    details_table.add_row(f"[sun]ᵁⱽᴵ [dim]ᶜˡᵉᵃʳ ˢᵏʸ ᵐᵃˣ[/][/] "
-        + represent_uvi(uvi_clear_sky).translate(superscript))
+    details_table.add_row(f"[sun]ᵁⱽᴵ [dim]ᶜˡᵉᵃʳ ˢᵏʸ ᵐᵃˣ[/][/] {uvi_clear_sky}")
     details_table.add_row()
     details_table.add_row(f"[dim]{current_time}[/]  {current_weather}   "
-        + represent_temperature(current_temperature,
-                                current_apparent_temperature)
-        + " [dim]°C[/]")
+                          f"{current_temperature} [dim]°C[/]")
 
     console = Console(theme=custom_theme)
     if console.size.width < 80:
         outer_table = Table.grid(padding=(1, 0), expand=True)
         outer_table.add_column()
         outer_table.add_row(details_table)
-        outer_table.add_row(table)
+        outer_table.add_row(forecast_table)
     else:
         outer_table = Table.grid(padding=(0, 2), expand=True)
         outer_table.add_column(no_wrap=True)
         outer_table.add_column()
-        outer_table.add_row(table, details_table)
+        outer_table.add_row(forecast_table, details_table)
     console.print(outer_table)
