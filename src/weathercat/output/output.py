@@ -196,7 +196,7 @@ def output(forecast, toponym):
         forecast["current_weather"]["temperature"],
         forecast["hourly"]["apparent_temperature"][
             forecast["hourly"]["time"].index(
-                forecast["current_weather"]["time"])])
+                forecast["current_weather"]["time"][:-3] + ":00")])
     details_table = Table.grid(expand=True)
     details_table.add_column(justify="right")
     details_table.add_row(f"[toponym]{toponym}[/]")
