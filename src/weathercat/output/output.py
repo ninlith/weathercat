@@ -189,7 +189,7 @@ def output(forecast, toponym):
     sunset = forecast["daily"]["sunset"][0].split("T")[1]
     uvi_clear_sky = represent_uvi(round(
         forecast["daily"]["uv_index_clear_sky_max"][0])).translate(superscript)
-    current_time = forecast["current_weather"]["time"].split("T")[1]
+    current_date, current_time = forecast["current_weather"]["time"].split("T")
     current_weather = represent_ww(
         forecast["current_weather"]["weathercode"])[0]
     current_temperature = represent_temperature(
@@ -199,10 +199,14 @@ def output(forecast, toponym):
                 forecast["current_weather"]["time"][:-3] + ":00")])
     details_table = Table.grid(expand=True)
     details_table.add_column(justify="right")
-    details_table.add_row(f"[toponym]{toponym}[/]")
+    toponym = toponym.rsplit(",", 1)
+    details_table.add_row(f"[toponym]{toponym[0]}[/]")
+    if len(toponym) > 1:
+        details_table.add_row(f"[toponym][dim]{toponym[1]}[/][/]")
     details_table.add_row()
     details_table.add_row(f"[sun]☉  {sunrise}–{sunset}[/]")
-    details_table.add_row(f"[sun]ᵁⱽᴵ [dim]ᶜˡᵉᵃʳ ˢᵏʸ ᵐᵃˣ[/][/] {uvi_clear_sky}")
+    details_table.add_row(
+        f"[sun][dim]{current_date}[/][/]".translate(superscript))
     details_table.add_row()
     details_table.add_row(f"[dim]{current_time}[/]  {current_weather}   "
                           f"{current_temperature} [dim]°C[/]")
