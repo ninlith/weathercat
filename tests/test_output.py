@@ -10,10 +10,7 @@ def print_saved_forecast():
     data = pkgutil.get_data(__name__, "forecast.txt")
     forecast = ast.literal_eval(data.decode("utf8"))
     forecast = transform(forecast)
-    output(forecast,
-           "Hölmölä, 24, Saarelantie, Evo, Hämeenlinna, Hämeenlinnan "
-           "seutukunta, Kanta-Häme, Etelä-Suomen aluehallintovirasto, "
-           "Manner-Suomi, 16970, Suomi")
+    output(forecast, "Hölmölä, Suomi")
 
 def test_temperature():
     """Test temperature representation."""

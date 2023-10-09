@@ -45,17 +45,17 @@ def represent_ww(code: int):  # pylint: disable=too-many-return-statements
     """Symbolize and colorize WMO Weather interpretation codes (WW)."""
     # https://open-meteo.com/en/docs#weathervariables
     if code in (0,):
-        return "☀️", "clear"
+        return "☀️ ", "clear"
     if code in (1, 2):
-        return "🌤️", "partly_cloudy"
+        return "🌤️ ", "partly_cloudy"
     if code in (3,):
-        return "☁️", "overcast"
+        return "☁️ ", "overcast"
     if code in (45, 48):
-        return "🌫️", "fog"
+        return "🌫️ ", "fog"
     if code in (51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82):
-        return "🌧️", "rain"
+        return "🌧️ ", "rain"
     if code in (71, 73, 75, 77, 85, 86):
-        return "❄️", "snow"
+        return "❄️ ", "snow"
     if code in (95, 96, 99):
         return "⚡", "thunderstorm"
     raise ValueError("Unsupported WMO Weather interpretation code: {code}")
@@ -178,7 +178,7 @@ def output(forecast, toponym):
             f"  {condition_bar}",
             f"[dim]{weekday}[/] ",
             f"{weather_symbol}",
-            f"  {min_temperature} [dim]/[/]",
+            f" {min_temperature} [dim]/[/]",
             f"{max_temperature} [dim]°C[/]",
             f" [dim]ᵁⱽ[/]{uvi}",
             f" {moon_symbol}")
@@ -208,7 +208,7 @@ def output(forecast, toponym):
     details_table.add_row(
         f"[sun][dim]{current_date}[/][/]".translate(superscript))
     details_table.add_row()
-    details_table.add_row(f"[dim]{current_time}[/]  {current_weather}   "
+    details_table.add_row(f"[dim]{current_time}[/]  {current_weather}  "
                           f"{current_temperature} [dim]°C[/]")
 
     console = Console(theme=custom_theme)
