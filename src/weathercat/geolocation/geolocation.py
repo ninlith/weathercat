@@ -16,19 +16,22 @@ except ImportError:
 
 logger = logging.getLogger(__package__)
 
-def georesolve(location: str) -> tuple[str | None, float, float]:
+def georesolve(location: str) -> tuple[str, float, float]:
     """Resolve description or coordinates to toponym and coordinates."""
     geolocator = geopy.geocoders.Nominatim(user_agent="weathercat")
     language = (locale.getlocale()[0] or "en").replace("_", "-")
     pattern = r"(?:geo:)?-?([0-9]+\.?[0-9]*)[ ,]+-?([0-9]+\.?[0-9]*).*"
     if match_coordinates := re.match(pattern, location):
+        latitude, longitude = map(float, match_coordinates.groups())
         try:
             response = geolocator.reverse(match_coordinates.string,
                                           language=language,
                                           addressdetails=True)
         except geopy.exc.GeocoderServiceError:
             logger.warning("Connection to Nominatim failed")
-            return None, *map(float, match_coordinates.groups())
+            return "Reverse geocoding unavailable", latitude, longitude
+        if not response:
+            return "Unknown location", latitude, longitude
     else:
         try:
             response = geolocator.geocode(location,
@@ -39,12 +42,15 @@ def georesolve(location: str) -> tuple[str | None, float, float]:
     if not response:
         raise LookupError(f"Unknown location: {location}")
     logger.debug(f"{response.raw = }")
-    if any(x in response.raw["address"] for x in ("village", "town", "city")):
-        toponym = ", ".join(response.raw["address"][x]
-                            for x in ("village", "town", "city", "country")
-                            if x in response.raw["address"])
-    else:
-        toponym = response.address
+    address = response.raw["address"]
+    types = [*[x for x in ["town", "village", "hamlet"] if x in address][:1],
+             *[x for x in ["city", "state"] if x in address][:1],
+             *[x for x in ["country"] if x in address]]
+    items = [address[x] for x in types]
+    if (response.raw["name"] and response.raw["addresstype"] not in types
+            and len(types) <= 1):
+        items.insert(0, response.raw["name"])
+    toponym = ", ".join(items)
     return toponym, response.latitude, response.longitude
 
 def geolocate() -> tuple[float, float]:
